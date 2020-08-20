@@ -27,15 +27,11 @@ echo alias youdl=$HOME/youdl.sh >> .zshrc
 La descarga quedara en la carpeta actual.
 
 Ejecutar en modo normal:
-----------------------
 youdl
-*Seguir las indicaciones
-----------------------
 
 Ejecutar en modo agil:
-----------------------
 youdl "link" "formato"
-----------------------
+
 Formatos:
 1 = Descarga el video en MP4
 2 = Descarga solo el audio en MP3
