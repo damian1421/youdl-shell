@@ -1,6 +1,5 @@
-you-dl.sh
+#!/data/data/com.termux/files/usr/bin/zsh
 clear
-sh $HOME/.zshrc
 log=$HOME/.log
 if [ -f $log ]
 then
@@ -54,22 +53,31 @@ if [ "$1" = "--help" ]
         echo 1 = Descarga el video en MP4
         echo 2 = Descarga solo el audio en MP3
         echo 3 = Playlist: Descarga solo la cancion actual
-        echo 4 = Playlist: Descarga la playlist completa; echo; echo; echo
-	echo 5 = Actualizar
-	echo 6 = Instalar
-	sleep 20
+        echo 4 = Playlist: Descarga la playlist completa
+		echo 5 = Actualizar
+		echo 6 = Instalar
+	    sleep 20
 fi
-#verify arguments included in string
-if [ -z "$2" ]
+
+#verify argument (link) included in string
+if [ -z "$1" ]
 then
 	clear
 	Title
 	InfoAyuda
 	echo Escribir el link del video:
 	read link
+	case $link in
+	[qQ])
+		clear
+		echo "Se ha cancelado la descarga"
+		exit 0
+		;;
+	esac
 else
-	link=$2
+	link=$1
 fi
+#Verify argument (format) included in string
 if [ -z "$2" ]
 then
 	clear
@@ -85,25 +93,30 @@ then
 else
 	INPUT=$2
 fi
-#Proceed to download target link in selected format
+#Proceed to download link in selected format
 if [ ${INPUT} = "1" ];
 	then
-        youtube-dl $link -i --recode-video mp4
-elif [ ${INPUT} = "2" ];
+    youtube-dl $link -i --recode-video mp4
+fi
+if [ ${INPUT} = "2" ];
        	then
 	youtube-dl $link -i --extract-audio --audio-format mp3
-elif [ ${INPUT} = "3" ];
+fi
+if [ ${INPUT} = "3" ];
 	then
 	youtube-dl $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-elif [ ${INPUT} = "4" ];
+fi
+if [ ${INPUT} = "4" ];
 	then
 	youtube-dl $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-elif [ ${INPUT} = "5" ];
+fi
+if [ ${INPUT} = "5" ];
 	then
 	clear
 	echo "Updating Youtube Downloader"
 	youtube-dl -U
-elif [ ${INPUT} = "6" ];
+fi
+if [ ${INPUT} = "6" ];
 	then
 	clear
 	touch $HOME/.log
@@ -111,7 +124,7 @@ elif [ ${INPUT} = "6" ];
 	echo "Copying youtube-dl to your $PREFIX/bin path"
 	cp youtube-dl $PREFIX/bin/
 	Status
-	read -p "What's your shell interpreter (bash / zsh)?" interpreter
+	read -p "What's your shell interpreter? bash / zsh" interpreter
 	rc=rc
 	Status
 	echo export youdl="$HOME/.you-dl.sh" >> .$interpreter$rc
