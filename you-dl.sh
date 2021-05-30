@@ -54,11 +54,9 @@ if [ "$1" = "--help" ]
         echo 2 = Descarga solo el audio en MP3
         echo 3 = Playlist: Descarga solo la cancion actual
         echo 4 = Playlist: Descarga la playlist completa
-	echo 5 = Actualizar
-	echo 6 = Instalar
-	echo Script creado por L0GG3R!
-        echo Consultas? ... ya veremos que hacemos con eso!
-        sleep 20
+		echo 5 = Actualizar
+		echo 6 = Instalar
+	    sleep 20
 fi
 
 #verify argument (link) included in string
@@ -98,7 +96,7 @@ fi
 #Proceed to download link in selected format
 if [ ${INPUT} = "1" ];
 	then
-        youtube-dl $link -i --recode-video mp4
+    youtube-dl $link -i --recode-video mp4
 fi
 if [ ${INPUT} = "2" ];
        	then
