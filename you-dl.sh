@@ -4,23 +4,25 @@
 #Source: https://github.com/damian1421/youdl-bash
 clear
 LOG=$HOME/.youdl.log
-if [ -f $log ]
+if [ -f $LOG ]
 then
-	 touch $log
+	 touch $LOG
 fi
+PREVFOLDER=`pwd` #Especifica la ruta desde la cual se ha invocado youdl.
+#Verificar si se ha declarado la ruta de descarga. || La declara en caso que no se haya definido.
 if [ -f $HOME/.youdl.conf ]
 then
 	echo "No se ha detectado el archivo de configuración"
 	echo "¿Cuál es tu sistema operativo?"
 	echo "1- Termux"
-	echo "2- Linux (Ubuntu, Debian, ...)"
+	echo "2- Linux: Ubuntu, Debian, ..."
 	echo "3- Windows + WSL"
 	read OS
 		case $OS in
 			1)
 			clear
 			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/data/data/com.termux/files/home/storage/shared/YouDL >> $HOME/.youdl.conf
+			echo "OUTFOLDER=/data/data/com.termux/files/home/storage/shared/YouDL" >> $HOME/.youdl.conf
 			sh $HOME/.youdl.conf
 			mkdir $OUTFOLDER
 			echo $OUTFOLDER
@@ -29,7 +31,7 @@ then
 			clear
 			USER=`whoami`
 			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/home/$USER/YouDL >> $HOME/.youdl.conf
+			echo "OUTFOLDER=/home/$USER/YouDL" >> $HOME/.youdl.conf
 			sh $HOME/.youdl.conf
 			mkdir $OUTFOLDER
 			echo $OUTFOLDER
@@ -38,7 +40,7 @@ then
 			clear
 			USER=`whoami`
 			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/mnt/c/Users/$USER/YouDL >> $HOME/.youdl.conf
+			echo "OUTFOLDER=/mnt/c/Users/$USER/YouDL" >> $HOME/.youdl.conf
 			sh $HOME/.youdl.conf
 			mkdir $OUTFOLDER
 			echo $OUTFOLDER
@@ -99,7 +101,7 @@ else
         echo "Formatos:"
         echo "1 = Descarga el video en MP4"
         echo "2 = Descarga solo el audio en MP3"
-        echo "3 = Playlist: Descarga solo la cancion actual"
+        echo "3 = Playlist: Descarga solo la canción actual"
         echo "4 = Playlist: Descarga la playlist completa"
 		echo "5 = Actualizar"
 		echo "6 = Instalar"
@@ -169,26 +171,21 @@ case $INPUT in
 		;;
 	6)
 		clear
-		touch $log
 		echo "Installing Youtube Downloader"
-		echo "Copying youtube-dl to your $PREFIX/bin path"
+		echo "Installing all prerrequisites"
 		apt-get -y install zsh python ffmpeg python git wget
-        pip install youtube-dl
-        clone https://github.com/damian1421/youdl-bash
+		pip install youtube-dl
+		echo "Cloning repository of YouDL"
+        git clone https://github.com/damian1421/youdl-bash
+		Status
 		echo "Setting up alias"
-        read -p "Interpreter BASH/ZSH: " INTERPRETER
-        echo youdl=$HOME/youdl-bash/you-dl.sh >> $INTERPRETER
-		Status
-		read -p "What's your shell interpreter? bash / zsh" interpreter
-		rc=rc
-		Status
-		echo export youdl="$HOME/.you-dl.sh" >> .$interpreter$rc
+		echo alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/*.shrc
 		Status
 		echo "Installation finished!"
 		;;
 esac
 
 Status(){
-step="!!"; echo [$?] $step
-!! >> $LOG
+STEP="!!"; echo [$?] $STEP
+echo [$?] $STEP >> $LOG
 }

@@ -1,28 +1,20 @@
 # youdl-bash
-GUI para youtube-dl (Linux/Termux)
+GUI para youtube-dl (Linux/Termux/Windows Subsystem for Linux)
 
 #Prerrequisites & Installation
-*Instalar youtube-dl:
-sudo apt install youtube-dl
-*Instalar ffmpeg (permite convertir formatos tras la descarga):
-sudo apt install ffmpeg
-*Crear alias para usarlo desde cualquier carpeta:
-	dirigirse a la carpeta donde se encuentre el script y verificar la ruta completa con el comando:
-	pwd
-	(Cómo registar el Alias)
-	Ejemplo de alias en Termux con la terminal bash:
-	echo alias youdl=/data/data/com.termux/files/home/youdl.sh >> .bashrc
-	Ejemplo de alias en Linux con la terminal zsh:
-	echo alias youdl=$HOME/youdl.sh >> .zshrc
+python
+git
+zsh #para mostrar correctamente los colores en pantalla.
+ffmpeg
 
 #Usage:
-La descarga quedara en la carpeta actual.
+La primera vez, se ejecutará automáticamente un asistente de configuración, e indicará la ruta de las descargas.
 
-Ejecutar en modo normal:
+Ejecutar normalmente:
 youdl
 
-Ejecutar en modo agil:
-youdl "link" "formato"
+Ejecutar en modo ágil:
+youdl "https://youtube.com/..." "2"
 
 Formatos:
 1 = Descarga el video en MP4
