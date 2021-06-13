@@ -1,9 +1,49 @@
 #!/data/data/com.termux/files/usr/bin/zsh
+
+#Author: l0gg3r
+#Source: https://github.com/damian1421/youdl-bash
 clear
-log=$HOME/.log
+LOG=$HOME/.youdl.log
 if [ -f $log ]
 then
 	 touch $log
+fi
+if [ -f $HOME/.youdl.conf ]
+then
+	echo "No se ha detectado el archivo de configuración"
+	echo "¿Cuál es tu sistema operativo?"
+	echo "1- Termux"
+	echo "2- Linux (Ubuntu, Debian, ...)"
+	echo "3- Windows + WSL"
+	read OS
+		case $OS in
+			1)
+			clear
+			echo "Tus descargas se guardarán en:"
+			echo "OUTFOLDER=/data/data/com.termux/files/home/storage/shared/YouDL >> $HOME/.youdl.conf
+			sh $HOME/.youdl.conf
+			mkdir $OUTFOLDER
+			echo $OUTFOLDER
+			;;
+			2)
+			clear
+			USER=`whoami`
+			echo "Tus descargas se guardarán en:"
+			echo "OUTFOLDER=/home/$USER/YouDL >> $HOME/.youdl.conf
+			sh $HOME/.youdl.conf
+			mkdir $OUTFOLDER
+			echo $OUTFOLDER
+			;;
+			3)
+			clear
+			USER=`whoami`
+			echo "Tus descargas se guardarán en:"
+			echo "OUTFOLDER=/mnt/c/Users/$USER/YouDL >> $HOME/.youdl.conf
+			sh $HOME/.youdl.conf
+			mkdir $OUTFOLDER
+			echo $OUTFOLDER
+			;;
+		esac
 fi
 DIA=`date +"%d/%m/%Y"`
 HORA=`date +"%H:%M"`
@@ -27,39 +67,15 @@ LCYAN='\033[1;36m'
 WHITE='\033[1;37m'
 NC='\033[0m' #No color
 
-#Sección título
-Title(){
+Title(){ #Sección título
 echo ${YELLOW}"Descargar video/música de YOUTUBE (...y muchos sitios más)"${NC}
 }
-#Sección info ayuda, informa como abrir la ayuda
-InfoAyuda(){
+
+InfoAyuda(){ #Sección info ayuda, informa como abrir la ayuda
 echo ${LGREY}"--help = Muestra la ayuda"${LBLUE}
 }
 
 #Help
-if [ "$1" = "--help" ]
-        then
-        clear
-	Title
-        echo ""
-        echo *Para utilizar el modo ágil:
-        echo Primero, registrar el alias en .bashrc
-        echo alias youdl="$HOME/.you-dl.sh"
-        echo Segundo, ejecutar el comando de este modo
-        echo ----------------------
-        echo youdl "link" "opción"
-        echo ----------------------
-        echo Formatos:
-        echo 1 = Descarga el video en MP4
-        echo 2 = Descarga solo el audio en MP3
-        echo 3 = Playlist: Descarga solo la cancion actual
-        echo 4 = Playlist: Descarga la playlist completa
-		echo 5 = Actualizar
-		echo 6 = Instalar
-	    sleep 20
-fi
-
-#verify argument (link) included in string
 if [ -z "$1" ]
 then
 	clear
@@ -67,74 +83,112 @@ then
 	InfoAyuda
 	echo Escribir el link del video:
 	read link
-	case $link in
+else
+	case $1 in
+	--help)
+		clear
+		Title
+        echo ""
+        echo "*Para utilizar el modo ágil:"
+        echo "Primero, registrar el alias en .bashrc"
+        echo "alias youdl='$HOME/.you-dl.sh'"
+        echo "Segundo, ejecutar el comando de este modo"
+        echo "----------------------"
+        echo "youdl 'link' 'formato'"
+        echo "----------------------"
+        echo "Formatos:"
+        echo "1 = Descarga el video en MP4"
+        echo "2 = Descarga solo el audio en MP3"
+        echo "3 = Playlist: Descarga solo la cancion actual"
+        echo "4 = Playlist: Descarga la playlist completa"
+		echo "5 = Actualizar"
+		echo "6 = Instalar"
+		echo "q = Salir"
+	    sleep 20
+		;;
 	[qQ])
 		clear
 		echo "Se ha cancelado la descarga"
+		echo "Saliendo..."
 		exit 0
 		;;
 	esac
-else
-	link=$1
 fi
-#Verify argument (format) included in string
+
+#Verifies format included when you'd launched the program
 if [ -z "$2" ]
 then
 	clear
 	Title
-	echo Elegir una opcion:
+	echo Elegir una opción:
 	echo 1 = Descarga el video en MP4
 	echo 2 = Descarga solo el audio en MP3
-	echo 3 = Playlist: Descarga solo la cancion actual
+	echo 3 = Playlist: Descarga solo la canción actual
 	echo 4 = Playlist: Descarga la playlist completa
 	echo 5 = Actualizar aplicación
 	echo --help = Ver ayuda
+	echo q = Salir
 	read INPUT
+	case $INPUT in
+		[qQ])
+			clear
+			echo "Saliendo del programa..."
+			echo "Se ha cancelado la descarga!"
+			exit 0
+	esac
 else
 	INPUT=$2
 fi
+
 #Proceed to download link in selected format
-if [ ${INPUT} = "1" ];
-	then
-    youtube-dl $link -i --recode-video mp4
-fi
-if [ ${INPUT} = "2" ];
-       	then
-	youtube-dl $link -i --extract-audio --audio-format mp3
-fi
-if [ ${INPUT} = "3" ];
-	then
-	youtube-dl $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-fi
-if [ ${INPUT} = "4" ];
-	then
-	youtube-dl $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-fi
-if [ ${INPUT} = "5" ];
-	then
-	clear
-	echo "Updating Youtube Downloader"
-	youtube-dl -U
-fi
-if [ ${INPUT} = "6" ];
-	then
-	clear
-	touch $HOME/.log
-	echo "Installing Youtube Downloader"
-	echo "Copying youtube-dl to your $PREFIX/bin path"
-	cp youtube-dl $PREFIX/bin/
-	Status
-	read -p "What's your shell interpreter? bash / zsh" interpreter
-	rc=rc
-	Status
-	echo export youdl="$HOME/.you-dl.sh" >> .$interpreter$rc
-	Status
-	echo "Deleting installer..."
-	rm youtube-dl
-	Status
-	echo "Installation finished!"
-fi
+case $INPUT in
+	1)
+		cd $OUTFOLDER
+		youtube-dl $link -i --recode-video mp4
+		cd $PREFOLDER
+		;;
+	2)
+		cd $OUTFOLDER
+		youtube-dl $link -i --extract-audio --audio-format mp3
+		cd $PREVFOLDER
+		;;
+	3)
+		cd $OUTFOLDER
+		youtube-dl $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
+		cd $PREVFOLDER
+		;;
+	4)
+		cd $OUTFOLDER
+		youtube-dl $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
+		cd $PREVFOLDER
+		;;
+	5)
+		clear
+		echo "Updating Youtube Downloader"
+		youtube-dl -U
+		;;
+	6)
+		clear
+		touch $log
+		echo "Installing Youtube Downloader"
+		echo "Copying youtube-dl to your $PREFIX/bin path"
+		apt-get -y install zsh python ffmpeg python git wget
+        pip install youtube-dl
+        clone https://github.com/damian1421/youdl-bash
+		echo "Setting up alias"
+        read -p "Interpreter BASH/ZSH: " INTERPRETER
+        echo youdl=$HOME/youdl-bash/you-dl.sh >> $INTERPRETER
+		Status
+		read -p "What's your shell interpreter? bash / zsh" interpreter
+		rc=rc
+		Status
+		echo export youdl="$HOME/.you-dl.sh" >> .$interpreter$rc
+		Status
+		echo "Installation finished!"
+		;;
+esac
 
 Status(){
 step="!!"; echo [$?] $step
+!! >> $LOG
 }
