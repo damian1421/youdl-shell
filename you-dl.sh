@@ -8,7 +8,7 @@ if [ -f $LOG ]
 then
 	 touch $LOG
 fi
-PREVFOLDER=`pwd` #Especifica la ruta desde la cual se ha invocado youdl.
+PREVFOLDER=`pwd` #Define la ruta desde la cual se ha invocado youdl.
 #Verificar si se ha declarado la ruta de descarga. || La declara en caso que no se haya definido.
 if [ -f $HOME/.youdl.conf ]
 then
@@ -128,6 +128,7 @@ then
 	echo 3 = Playlist: Descarga solo la canción actual
 	echo 4 = Playlist: Descarga la playlist completa
 	echo 5 = Actualizar aplicación
+	echo 6 = Instalar YouDL
 	echo --help = Ver ayuda
 	echo q = Salir
 	read INPUT
@@ -174,18 +175,27 @@ case $INPUT in
 		echo "Installing Youtube Downloader"
 		echo "Installing all prerrequisites"
 		apt-get -y install zsh python ffmpeg python git wget
+		STEP="Prerrequisites"
+		echo [$?] $STEP
+		echo [$?] $STEP >> $LOG
 		pip install youtube-dl
+		STEP="Install youtube-dl"
+		echo [$?] $STEP
+		echo [$?] $STEP >> $LOG
 		echo "Cloning repository of YouDL"
-        git clone https://github.com/damian1421/youdl-bash
-		Status
+        	git clone https://github.com/damian1421/youdl-bash
+		STEP="Clone repository YouDL"
+		echo [$?] $STEP
+		echo [$?] $STEP >> $LOG
 		echo "Setting up alias"
-		echo alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/*.shrc
-		Status
+		echo "alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/.zshrc"
+		STEP="Setting up .zshrc"
+		echo [$?] $STEP
+		echo [$?] $STEP >> $LOG
+		echo "alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/.bashrc"
+		STEP="Setting up .bashrc"
+		echo [$?] $STEP
+		echo [$?] $STEP >> $LOG
 		echo "Installation finished!"
 		;;
 esac
-
-Status(){
-STEP="!!"; echo [$?] $STEP
-echo [$?] $STEP >> $LOG
-}
