@@ -1,15 +1,17 @@
 #!/data/data/com.termux/files/usr/bin/zsh
 
 #Author: l0gg3r
-#Source: https://github.com/damian1421/youdl-bash
+#Description: Download videos from Youtube, Facebook & more sites...!
+#Source: https://github.com/damian1421/youdl-shell
 clear
 LOG=$HOME/.youdl.log
 if [ -f $LOG ]
 then
 	 touch $LOG
 fi
-PREVFOLDER=`pwd` #Define la ruta desde la cual se ha invocado youdl.
-#Verificar si se ha declarado la ruta de descarga. || La declara en caso que no se haya definido.
+#Define la ruta desde la cual se ha invocado youdl.
+PREVFOLDER=`pwd`
+#Verificar si se ha declarado la ruta de descarga "$OUTFOLDER". || En caso que no se haya definido anteriormente, lo hace.
 if [ -f $HOME/.youdl.conf ]
 then
 	echo "No se ha detectado el archivo de configuración"
@@ -22,28 +24,28 @@ then
 			1)
 			clear
 			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/data/data/com.termux/files/home/storage/shared/YouDL" >> $HOME/.youdl.conf
-			sh $HOME/.youdl.conf
-			mkdir $OUTFOLDER
-			echo $OUTFOLDER
+			OUTFOLDER="/data/data/com.termux/files/home/storage/shared/YouDL"
+			if [ -d $OUTFOLDER ]; then mkdir $OUTFOLDER; fi
+			echo $OUTFOLDER >> $HOME/.youdl.conf
+			echo $OUTFOLDER >> $HOME/.*.hrc
 			;;
 			2)
 			clear
 			USER=`whoami`
 			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/home/$USER/YouDL" >> $HOME/.youdl.conf
-			sh $HOME/.youdl.conf
-			mkdir $OUTFOLDER
-			echo $OUTFOLDER
+			OUTFOLDER="/home/$USER/YouDL"
+			if [ -d $OUTFOLDER ]; then mkdir $OUTFOLDER; fi
+			echo $OUTFOLDER >> $HOME/.youdl.conf
+			echo $OUTFOLDER >> $HOME/.*.hrc
 			;;
 			3)
 			clear
 			USER=`whoami`
 			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/mnt/c/Users/$USER/YouDL" >> $HOME/.youdl.conf
-			sh $HOME/.youdl.conf
-			mkdir $OUTFOLDER
-			echo $OUTFOLDER
+			OUTFOLDER="/mnt/c/Users/$USER/YouDL"
+			if [ -d $OUTFOLDER ]; then mkdir $OUTFOLDER; fi
+			echo $OUTFOLDER >> $HOME/.youdl.conf
+			echo $OUTFOLDER >> $HOME/.*.hrc
 			;;
 		esac
 fi
@@ -148,7 +150,7 @@ case $INPUT in
 	1)
 		cd $OUTFOLDER
 		youtube-dl $link -i --recode-video mp4
-		cd $PREFOLDER
+		cd $PREVFOLDER
 		;;
 	2)
 		cd $OUTFOLDER
@@ -174,7 +176,7 @@ case $INPUT in
 		clear
 		echo "Installing Youtube Downloader"
 		echo "Installing all prerrequisites"
-		apt-get -y install zsh python ffmpeg python git wget
+		apt-get -y install zsh python ffmpeg git wget
 		STEP="Prerrequisites"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
@@ -183,16 +185,16 @@ case $INPUT in
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Cloning repository of YouDL"
-        	git clone https://github.com/damian1421/youdl-bash
+        	git clone https://github.com/damian1421/youdl-shell
 		STEP="Clone repository YouDL"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Setting up alias"
-		echo "alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/.zshrc"
+		echo "alias youdl=$PREVFOLDER/you-dl.sh >> $HOME/.*shrc"
 		STEP="Setting up .zshrc"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
-		echo "alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/.bashrc"
+		echo "alias youdl=$PREVFOLDER/you-dl.sh >> $HOME/.*shrc"
 		STEP="Setting up .bashrc"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
