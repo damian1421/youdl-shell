@@ -1,52 +1,23 @@
 #!/data/data/com.termux/files/usr/bin/zsh
 
 #Author: l0gg3r
-#Source: https://github.com/damian1421/youdl-bash
+#Source: https://github.com/damian1421/youdl-shell
 clear
-LOG=$HOME/.youdl.log
-if [ -f $LOG ]
+LOG="$PREFIX/var/log/youdl/youdl.log"
+#Complete the following line with the path to download the media:
+export OUTFOLDER=/data/data/com.termux/files/home/storage/shared/YouDL
+
+if [ -s $LOG ]
 then
-	 touch $LOG
+	echo "[OK] Log exists"
+else
+	echo "[--] Initializing Log ..."
+	mkdir -p $PREFIX/var/log/youdl && touch $LOG
 fi
-PREVFOLDER=`pwd` #Define la ruta desde la cual se ha invocado youdl.
-#Verificar si se ha declarado la ruta de descarga. || La declara en caso que no se haya definido.
-if [ -f $HOME/.youdl.conf ]
-then
-	echo "No se ha detectado el archivo de configuración"
-	echo "¿Cuál es tu sistema operativo?"
-	echo "1- Termux"
-	echo "2- Linux: Ubuntu, Debian, ..."
-	echo "3- Windows + WSL"
-	read OS
-		case $OS in
-			1)
-			clear
-			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/data/data/com.termux/files/home/storage/shared/YouDL" >> $HOME/.youdl.conf
-			sh $HOME/.youdl.conf
-			mkdir $OUTFOLDER
-			echo $OUTFOLDER
-			;;
-			2)
-			clear
-			USER=`whoami`
-			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/home/$USER/YouDL" >> $HOME/.youdl.conf
-			sh $HOME/.youdl.conf
-			mkdir $OUTFOLDER
-			echo $OUTFOLDER
-			;;
-			3)
-			clear
-			USER=`whoami`
-			echo "Tus descargas se guardarán en:"
-			echo "OUTFOLDER=/mnt/c/Users/$USER/YouDL" >> $HOME/.youdl.conf
-			sh $HOME/.youdl.conf
-			mkdir $OUTFOLDER
-			echo $OUTFOLDER
-			;;
-		esac
-fi
+
+#Verifica la ruta de descargas y crea un soft-link en $HOME apuntando a la ruta de descargas en /sdcard/YouDL
+[ -d $OUTFOLDER ] || md $OUTFOLDER ; ln -s $OUTFOLDER $HOME/YouDL
+
 DIA=`date +"%d/%m/%Y"`
 HORA=`date +"%H:%M"`
 
@@ -73,6 +44,18 @@ Title(){ #Sección título
 echo ${YELLOW}"Descargar video/música de YOUTUBE (...y muchos sitios más)"${NC}
 }
 
+Menu(){ #Muestra opciones del menú, para elegir el formato de descarga
+echo Elegir una opción para la descarga:
+echo 1 = MP4 Descarga el video
+echo 2 = MP3 Descarga solo el audio
+echo 3 = MP3 Playlist: Descarga sólo la canción actual
+echo 4 = MP3 Playlist: Descarga la playlist completa
+echo 5 = Actualizar aplicación
+echo 6 = Instalar YouDL
+echo --help = Ver ayuda
+echo q = Salir
+}
+
 InfoAyuda(){ #Sección info ayuda, informa como abrir la ayuda
 echo ${LGREY}"--help = Muestra la ayuda"${LBLUE}
 }
@@ -90,23 +73,17 @@ else
 	--help)
 		clear
 		Title
-        echo ""
-        echo "*Para utilizar el modo ágil:"
-        echo "Primero, registrar el alias en .bashrc"
-        echo "alias youdl='$HOME/.you-dl.sh'"
-        echo "Segundo, ejecutar el comando de este modo"
-        echo "----------------------"
-        echo "youdl 'link' 'formato'"
-        echo "----------------------"
-        echo "Formatos:"
-        echo "1 = Descarga el video en MP4"
-        echo "2 = Descarga solo el audio en MP3"
-        echo "3 = Playlist: Descarga solo la canción actual"
-        echo "4 = Playlist: Descarga la playlist completa"
-		echo "5 = Actualizar"
-		echo "6 = Instalar"
-		echo "q = Salir"
-	    sleep 20
+		echo ""
+		echo "*Para utilizar el modo ágil:"
+		echo "Primero, registrar el alias en .bashrc"
+		echo "alias youdl='$HOME/.you-dl.sh'"
+		echo "Segundo, ejecutar el comando de este modo"
+		echo "----------------------"
+		echo "youdl 'link' 'formato'"
+		echo "----------------------"
+		echo "Formatos:"
+		Menu
+		sleep 20
 		;;
 	[qQ])
 		clear
@@ -117,20 +94,13 @@ else
 	esac
 fi
 
-#Verifies format included when you'd launched the program
+#Verifica el formato indicado para realizar la descarga
 if [ -z "$2" ]
 then
 	clear
 	Title
-	echo Elegir una opción:
-	echo 1 = Descarga el video en MP4
-	echo 2 = Descarga solo el audio en MP3
-	echo 3 = Playlist: Descarga solo la canción actual
-	echo 4 = Playlist: Descarga la playlist completa
-	echo 5 = Actualizar aplicación
-	echo 6 = Instalar YouDL
-	echo --help = Ver ayuda
-	echo q = Salir
+	link=$1
+	Menu
 	read INPUT
 	case $INPUT in
 		[qQ])
@@ -140,60 +110,62 @@ then
 			exit 0
 	esac
 else
+	link=$1
 	INPUT=$2
 fi
 
-#Proceed to download link in selected format
+#Procede a realizar la descarga según el $INPUT indicado
+clear
 case $INPUT in
 	1)
 		cd $OUTFOLDER
-		youtube-dl $link -i --recode-video mp4
-		cd $PREFOLDER
+		echo "Download: MP4 of -> $1"
+		youtube-dl $link -i --recode-video mp4 -o "%(title)s.%(ext)s"
 		;;
 	2)
 		cd $OUTFOLDER
-		youtube-dl $link -i --extract-audio --audio-format mp3
-		cd $PREVFOLDER
+		echo "Download: MP3 of -> $1"
+		youtube-dl $link -i --extract-audio --audio-format mp3 -o "%(title)s.%(ext)s"
 		;;
 	3)
 		cd $OUTFOLDER
-		youtube-dl $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-		cd $PREVFOLDER
+		echo "Download: Only current song in MP3 of Playlist -> $1"
+		youtube-dl $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0 -o "%(title)s.%(ext)s"
 		;;
 	4)
 		cd $OUTFOLDER
-		youtube-dl $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-		cd $PREVFOLDER
+		echo "Download:  all songs in MP3 of Playlist -> $1"
+		youtube-dl $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0 -o "%(title)s.%(ext)s"
 		;;
 	5)
 		clear
 		echo "Updating Youtube Downloader"
-		youtube-dl -U
+		pip3 install --upgrade youtube-dl || youtube-dl -U
 		;;
 	6)
 		clear
 		echo "Installing Youtube Downloader"
 		echo "Installing all prerrequisites"
-		apt-get -y install zsh python ffmpeg python git wget
 		STEP="Prerrequisites"
+		apt-get -y install zsh python ffmpeg python git wget
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
-		pip install youtube-dl
 		STEP="Install youtube-dl"
+		pip install youtube-dl
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Cloning repository of YouDL"
-        	git clone https://github.com/damian1421/youdl-bash
-		STEP="Clone repository YouDL"
+        	STEP="Clone repository YouDL"
+		git clone https://github.com/damian1421/youdl-shell
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Setting up alias"
-		echo "alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/.zshrc"
 		STEP="Setting up .zshrc"
+		echo "alias youdl=`pwd`/youdl-shell/you-dl.sh" >> $HOME/.zshrc
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
-		echo "alias youdl=`pwd`/youdl-bash/you-dl.sh >> $HOME/.bashrc"
 		STEP="Setting up .bashrc"
+		echo "alias youdl=`pwd`/youdl-shell/you-dl.sh" >> $HOME/.bashrc
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Installation finished!"
