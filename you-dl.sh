@@ -105,16 +105,19 @@ else
         echo "2 = Descarga solo el audio en MP3"
         echo "3 = Playlist: Descarga solo la canción actual"
         echo "4 = Playlist: Descarga la playlist completa"
-		echo "5 = Actualizar"
-		echo "6 = Instalar"
-		echo "q = Salir"
-	    sleep 20
-		;;
+	echo "5 = Actualizar"
+	echo "6 = Instalar"
+	echo "q = Salir"
+	sleep 20
+	;;
 	[qQ])
 		clear
 		echo "Se ha cancelado la descarga"
 		echo "Saliendo..."
 		exit 0
+		;;
+	*)
+		link=$1
 		;;
 	esac
 fi
@@ -140,37 +143,39 @@ then
 			echo "Saliendo del programa..."
 			echo "Se ha cancelado la descarga!"
 			exit 0
+			;;
+	1)INPUT=1
+	;;
+	2)INPUT=2
+        ;;
+	3)INPUT=3
+        ;;
+	4)INPUT=4
+        ;;
 	esac
 else
 	INPUT=$2
 fi
 
 #Proceed to download link in selected format
+
 case $INPUT in
 	1)
-		cd $OUTFOLDER
-		youtube-dl $link -i --recode-video mp4
-		cd $PREVFOLDER
+		yt-dlp -o '/data/data/com.termux/files/home/YouDL/%(title)s.%(ext)s' $link -i --recode-video mp4
 		;;
 	2)
-		cd $OUTFOLDER
-		youtube-dl $link -i --extract-audio --audio-format mp3
-		cd $PREVFOLDER
+		yt-dlp -o '/data/data/com.termux/files/home/YouDL/%(title)s.%(ext)s' $link -i --extract-audio --audio-format mp3
 		;;
 	3)
-		cd $OUTFOLDER
-		youtube-dl $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-		cd $PREVFOLDER
+		yt-dlp -o '/data/data/com.termux/files/home/YouDL/%(title)s.%(ext)s' $link --no-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
 		;;
 	4)
-		cd $OUTFOLDER
-		youtube-dl $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
-		cd $PREVFOLDER
+		yt-dlp -o '/data/data/com.termux/files/home/YouDL/%(title)s.%(ext)s' $link --yes-playlist -i  --extract-audio --audio-format mp3 --audio-quality 0
 		;;
 	5)
 		clear
 		echo "Updating Youtube Downloader"
-		youtube-dl -U
+		yt-dlp -U
 		;;
 	6)
 		clear
@@ -180,8 +185,9 @@ case $INPUT in
 		STEP="Prerrequisites"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
-		pip install youtube-dl
-		STEP="Install youtube-dl"
+		pip uninstall youtube-dl
+		pip install yt-dlp
+		STEP="Install yt-dlp"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Cloning repository of YouDL"
