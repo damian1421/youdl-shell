@@ -14,7 +14,7 @@ Ejecutar normalmente:
 youdl
 
 Ejecutar en modo ágil:
-youdl <url> <opciòn de formato (nùmero)>
+youdl <url> <opción de formato (número)>
 
 Formatos:
 1 = Descarga el video en MP4

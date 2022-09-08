@@ -3,6 +3,8 @@
 #Author: l0gg3r
 #Description: Download videos from Youtube, Facebook & more sites...!
 #Source: https://github.com/damian1421/youdl-shell
+#Version: 2.0
+#Date: 09-08-2022
 clear
 LOG=$HOME/.youdl.log
 if [ -f $LOG ]
