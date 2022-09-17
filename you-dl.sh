@@ -183,27 +183,18 @@ case $INPUT in
 		clear
 		echo "Installing Youtube Downloader"
 		echo "Installing all prerrequisites"
-		apt-get -y install zsh python ffmpeg git wget
 		STEP="Prerrequisites"
+		apt-get -y install zsh python ffmpeg git wget pip
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
-		pip uninstall youtube-dl
-		pip install yt-dlp
 		STEP="Install yt-dlp"
+		pip install yt-dlp
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Cloning repository of YouDL"
-        	git clone https://github.com/damian1421/youdl-shell
-		STEP="Clone repository YouDL"
-		echo [$?] $STEP
-		echo [$?] $STEP >> $LOG
 		echo "Setting up alias"
-		echo "alias youdl=$PREVFOLDER/you-dl.sh >> $HOME/.*shrc"
 		STEP="Setting up .zshrc"
-		echo [$?] $STEP
-		echo [$?] $STEP >> $LOG
 		echo "alias youdl=$PREVFOLDER/you-dl.sh >> $HOME/.*shrc"
-		STEP="Setting up .bashrc"
 		echo [$?] $STEP
 		echo [$?] $STEP >> $LOG
 		echo "Installation finished!"
